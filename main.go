@@ -13,7 +13,7 @@ func main() {
 	router := mux.NewRouter()
 	
 	router.HandleFunc("/getTransactions/{address}", api.GetTransactionDetails).Methods("GET")
-	router.HandleFunc("/addTransactions/", api.InsertTransactionDetails).Methods("GET")
+	router.HandleFunc("/addTransactions/", api.InsertTransactionDetails)
 	http.ListenAndServe(":8000", router)
 }
 

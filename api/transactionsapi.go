@@ -29,7 +29,8 @@ func GetTransactionDetails(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	address := vars["address"]
-	iterable := db.Session.Query("select user_add,to_add,tx_id,block_no FROM blockchain.transactions where user_add = ?", address).Iter()
+	get_query := fmt.Sprintf("select user_add,to_add,tx_id,block_no FROM %s.transactions where user_add = ?", utils.Keyspace)
+	iterable := db.Session.Query(get_query, address).Iter()
 	for iterable.MapScan(m) {
 		userList = append(userList, utils.User{
 			UserAddress: m["user_add"].(string),

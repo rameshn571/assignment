@@ -1,9 +1,8 @@
-An api to fetch user transactions from etherum node hosted on infura's Kovan testnet.
-
+Project Titls : Design an api to fetch user transactions from etherum node hosted on infura's Kovan testnet.
 
 Step1: Configure following variables in constants 
 
-Ethclient = [kovan test net api end point]
+Ethclient = [kovan testnet api end point]
 
 Cassandrahost = [cassandra host ip address]
 
@@ -16,9 +15,9 @@ Step 2: Run main.go file - go run main.io
     	start local server with 8000 port
 	
 
-Step 3: To insert user transaction details into the database
+Step 3: To insert user transaction details into the database(getting from kovan testnet api)
 
-call api end point GET: http://127.0.0.1:8000/addTransactions/
+call api end point POST: http://127.0.0.1:8000/addTransactions/
 
 Step 4: To get user transactions
 
@@ -53,12 +52,16 @@ CREATE TABLE blockchain.transactions (
 )
 
 
+user_add --> sender address
+to_add --> receiver address
+tx_id --> transaction id
+
 PRIMARY KEY (user_add, to_add, tx_id): The partition key is user_add, the composite clustering key is (to_add, tx_id)
-create secondary index on to_add -- > to get to address transactions
+
+create secondary index on to_add -- > to get receiver address transactions.
 
 
-
-3rd party libraries : 
+3rd party library : 
 gorilla/mux --> implements a request router and dispatcher for matching incoming requests to their respective handler.The name mux stands for "HTTP request multiplexer".
 
  
