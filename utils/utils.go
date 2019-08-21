@@ -5,8 +5,8 @@ import (
 )
 
 const Ethclient = "https://kovan.infura.io/v3/6c6f87a10e12438f8fbb7fc7c762b37c"
-const Cassandrahost = "127.0.0.1"
-const Keyspace = "blockchain"
+const Cassandrahost = "192.168.14.18"
+const Keyspace = "blockchain1"
 const Totalblocks = 10000
 
 type User struct {

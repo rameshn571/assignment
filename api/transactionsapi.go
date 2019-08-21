@@ -74,6 +74,7 @@ func insertIntoDatabase() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.TruncateTable()
 
 	for i := int64(1); i < int64(utils.Totalblocks); i++ {
 		latestBN := latest - i

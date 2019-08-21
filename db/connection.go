@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gocql/gocql"
 	"log"
+	"time"
 )
 
 // Session holds our connection to Cassandra
@@ -15,23 +16,29 @@ func init() {
 	var err error
 	cluster := gocql.NewCluster(utils.Cassandrahost)
 	cluster.Consistency = gocql.Quorum
+        cluster.ConnectTimeout = time.Second * 10
 	Session, err = cluster.CreateSession()
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 
-	ks_query := fmt.Sprintf("CREATE KEYSPACE %s WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};", utils.Keyspace)
+	ks_query := fmt.Sprintf("CREATE KEYSPACE if NOT EXISTS %s WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}", utils.Keyspace)
 	err = Session.Query(ks_query).Exec()
 	if err != nil {
 		log.Println(err)
 	}
 
-	t_query := fmt.Sprintf("CREATE TABLE %s.transactions (user_add text,to_add text,tx_id text,block_diff varint,block_hash text,block_no varint,block_time varint,tx_gas varint,tx_gas_price varint,tx_val varint,PRIMARY KEY (user_add, to_add, tx_id));", utils.Keyspace)
+	t_query := fmt.Sprintf("CREATE TABLE if NOT EXISTS %s.transactions (user_add text,to_add text,tx_id text,block_diff varint,block_hash text,block_no varint,block_time varint,tx_gas varint,tx_gas_price varint,tx_val varint,PRIMARY KEY (user_add, to_add, tx_id))", utils.Keyspace)
 	err = Session.Query(t_query).Exec()
 	if err != nil {
 		log.Println(err)
 	}
-	CreateIndex()
+	time.Sleep(5 * time.Second)
+	ind_query := fmt.Sprintf("create INDEX if NOT EXISTS to_add_index ON %s.transactions(to_add)", utils.Keyspace)
+	err = Session.Query(ind_query).Exec()
+	if err != nil {
+		log.Println(err)
+	}
 	fmt.Println("cassandra init done")
 }
 
@@ -42,16 +49,6 @@ func Insert(fromAddress string, toAddress string, txId string, blockDiff uint64,
 	err = Session.Query(i_query,
 		fromAddress, toAddress, txId, blockDiff, blockHash, blockNumber, blockTime, txGas, txGasPrice, txVal).Exec()
 
-	if err != nil {
-		log.Println(err)
-		return
-	}
-}
-
-func CreateIndex() {
-	var err error
-	trun_query := fmt.Sprintf("create INDEX if NOT EXISTS to_add_index ON %s.transactions(to_add);", utils.Keyspace)
-	err = Session.Query(trun_query).Exec()
 	if err != nil {
 		log.Println(err)
 		return
