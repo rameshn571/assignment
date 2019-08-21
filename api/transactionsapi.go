@@ -29,9 +29,24 @@ func GetTransactionDetails(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	address := vars["address"]
-	get_query := fmt.Sprintf("select user_add,to_add,tx_id,block_no FROM %s.transactions where user_add = ?", utils.Keyspace)
-	iterable := db.Session.Query(get_query, address).Iter()
-	for iterable.MapScan(m) {
+
+	// this query for out transactions
+	out_query := fmt.Sprintf("select user_add,to_add,tx_id,block_no FROM %s.transactions where user_add = ?", utils.Keyspace)
+	outTran := db.Session.Query(out_query, address).Iter()
+	for outTran.MapScan(m) {
+		userList = append(userList, utils.User{
+			UserAddress: m["user_add"].(string),
+			ToAddress:   m["to_add"].(string),
+			TxnId:       m["tx_id"].(string),
+			BlockNo:     m["block_no"].(*big.Int),
+		})
+		m = map[string]interface{}{}
+	}
+
+	in_query := fmt.Sprintf("select user_add,to_add,tx_id,block_no FROM %s.transactions where to_add = ?", utils.Keyspace)
+	inTran := db.Session.Query(in_query, address).Iter()
+
+	for inTran.MapScan(m) {
 		userList = append(userList, utils.User{
 			UserAddress: m["user_add"].(string),
 			ToAddress:   m["to_add"].(string),

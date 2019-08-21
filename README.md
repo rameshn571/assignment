@@ -35,7 +35,7 @@ Result :
 
 Db Design :
 
-CREATE KEYSPACE blockchain WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;
+CREATE KEYSPACE blockchain WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};
 
 CREATE TABLE blockchain.transactions (
     user_add text,
@@ -49,19 +49,26 @@ CREATE TABLE blockchain.transactions (
     tx_gas_price varint,
     tx_val varint,
     PRIMARY KEY (user_add, to_add, tx_id)
-)
+);
 
+--> PRIMARY KEY (user_add, to_add, tx_id): The partition key is user_add, the composite clustering key is (to_add, tx_id)
 
 user_add --> sender address
 to_add --> receiver address
 tx_id --> transaction id
 
-PRIMARY KEY (user_add, to_add, tx_id): The partition key is user_add, the composite clustering key is (to_add, tx_id)
+--> In cassandra [OR condition] is not supported
+    thats reason i wrote two queries one for out_transactions another one for in_transactions 
+    
+--> getting out transactions using below query (used_add is Partition key)
+    [select user_add,to_add,tx_id,block_no FROM %s.transactions where user_add = ?;]
+	
+--> getting in transactions using below query here created secondary index on to_add
+    [select user_add,to_add,tx_id,block_no FROM %s.transactions where to_add = ?"]
+    [create INDEX if NOT EXISTS to_add_index ON %s.transactions(to_add);]
 
-create secondary index on to_add -- > to get receiver address transactions.
 
-
-3rd party library : 
+3rd party library :
 gorilla/mux --> implements a request router and dispatcher for matching incoming requests to their respective handler.The name mux stands for "HTTP request multiplexer".
 
  
