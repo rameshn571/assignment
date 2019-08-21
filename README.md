@@ -1,4 +1,4 @@
-Alt-Project Title : Design an api to fetch user transactions from etherum node hosted on infura's Kovan testnet.
+**Project Title : Design an api to fetch user transactions from etherum node hosted on infura's Kovan testnet.**
 
 Step1: Configure following variables in utis.go 
 
@@ -34,7 +34,7 @@ Result :
 -----------------------------------------------------------------------------------------------------------------------------------------------
 
 
-Alt-Db Design :
+**Db Design**
 
 CREATE KEYSPACE blockchain WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};
 
@@ -69,7 +69,7 @@ tx_id --> transaction id
     [create INDEX if NOT EXISTS to_add_index ON %s.transactions(to_add);]
 
 
-Alt-3rd party library :
+**3rd party library**
 gorilla/mux --> implements a request router and dispatcher for matching incoming requests to their respective handler.The name mux stands for "HTTP request multiplexer".
 
  
